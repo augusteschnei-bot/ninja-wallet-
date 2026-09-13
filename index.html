@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ninja Wallet - Yon bous. Tout sa w bezwen.</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* RESET & BASE STYLES */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0b0e14;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px 10px;
+    }
+
+    /* PHONE CONTAINER */
+    .phone-container {
+      width: 100%;
+      max-width: 390px;
+      height: 780px;
+      background-color: #121824;
+      border-radius: 40px;
+      border: 8px solid #1f293d;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 85, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* BACKGROUND ANIMATED / THEME OVERLAY */
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 20%, rgba(255, 85, 0, 0.15) 0%, rgba(18, 24, 36, 0.95) 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px 8px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 10;
+    }
+
+    /* APP HEADER */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      z-index: 10;
+    }
+
+    .app-header .title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-header .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SCREEN VIEWS */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 20px;
+      z-index: 5;
+      position: relative;
+    }
+
+    .content-area::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* COMPONENTS */
+    .btn-orange {
+      background: linear-gradient(135deg, #ff5500, #ff2200);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 85, 0, 0.4);
+      transition: 0.2s;
+    }
+
+    .btn-orange:active {
+      transform: scale(0.98);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      color: #a0aec0;
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #ff5500;
+    }
+
+    /* BALANCE DISPLAY */
+    .balance-card {
+      background: linear-gradient(135deg, rgba(255, 85, 0, 0.2), rgba(0, 0, 0, 0.4));
+      border: 1px solid rgba(255, 85, 0, 0.3);
+      text-align: center;
+      padding: 20px;
+      border-radius: 20px;
+    }
+
+    .balance-card .amount {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 10px 0;
+      color: #ffffff;
+    }
+
+    /* ACTION BUTTONS GRID */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .action-btn:active {
+      background: rgba(255, 85, 0, 0.2);
+    }
+
+    .action-btn i {
+      font-size: 18px;
+      color: #ff5500;
+      margin-bottom: 6px;
+    }
+
+    .action-btn span {
+      font-size: 11px;
+      color: #ccc;
+    }
+
+    /* NAV BAR */
+    .bottom-nav {
+      height: 65px;
+      background: rgba(18, 24, 36, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #718096;
+      cursor: pointer;
+      font-size: 10px;
+      gap: 4px;
+    }
+
+    .nav-item i {
+      font-size: 18px;
+    }
+
+    .nav-item.active {
+      color: #ff5500;
+    }
+
+    /* VIRTUAL CARD */
+    .credit-card {
+      background: linear-gradient(135deg, #111, #222);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      border: 1px solid rgba(255, 85, 0, 0.4);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+
+    .credit-card .logo {
+      font-size: 16px;
+      font-weight: bold;
+      color: #ff5500;
+    }
+
+    .credit-card .chip {
+      width: 35px;
+      height: 26px;
+      background: #d4af37;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .credit-card .number {
+      font-size: 18px;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+    }
+
+    .credit-card .details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    /* CHAT BUBBLES */
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 380px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .msg.bot {
+      background: rgba(255, 255, 255, 0.1);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .msg.user {
+      background: #ff5500;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    /* TRANSACTION LIST */
+    .tx-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tx-item:last-child {
+      border-bottom: none;
+    }
+
+    .tx-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-right: 12px;
+    }
+
+    .tx-plus { background: rgba(0, 200, 81, 0.2); color: #00c851; }
+    .tx-minus { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
+
+    /* PIN PAD */
+    .pin-display {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #ff5500;
+    }
+
+    .pin-dot.filled {
+      background: #ff5500;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    .key {
+      height: 55px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .key:active {
+      background: rgba(255, 85, 0, 0.3);
+    }
+
+    .avatar-ninja {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px solid #ff5500;
+      margin: 0 auto 10px auto;
+      display: block;
+      background: url('https://api.dicebear.com/7.x/bottts/svg?seed=Ninja') #222;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-container">
+    <div class="bg-overlay"></div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div>
+        <i class="fa-solid fa-signal"></i>
+        <i class="fa-solid fa-wifi" style="margin: 0 4px;"></i>
+        <i class="fa-solid fa-battery-full"></i>
+      </div>
+    </div>
+
+    <!-- CONTENT AREA WITH ALL SCREENS -->
+    <div class="content-area">
+
+      <!-- 1. LANDING / WELCOME SCREEN -->
+      <div id="screen-welcome" class="screen active">
+        <div style="text-align: center; padding-top: 40px;">
+          <div style="font-size: 60px; color: #ff5500; margin-bottom: 20px;">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+          <h1 style="font-size: 28px; font-weight: 900; letter-spacing: 1px;">NINJA WALLET</h1>
+          <p style="color: #aaa; margin: 10px 0 40px 0; font-size: 14px;">Pi plis pase yon bous, se yon misyon !</p>
+          
+          <button class="btn-orange" onclick="showScreen('screen-login')" style="margin-bottom: 12px;">Konekte</button>
+          <button class="btn-outline" onclick="showScreen('screen-register')">Enskri</button>
+          
+          <p style="font-size: 11px; color: #666; margin-top: 30px;">Demo Mode • Pa gen lajan reyèl</p>
+        </div>
+      </div>
+
+      <!-- 2. LOGIN SCREEN -->
+      <div id="screen-login" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-welcome')"><i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+        <h2 style="margin-top: 10px;">Byenveni tounen</h2>
+        <p style="color: #888; font-size: 12px; margin-bottom: 25px;">Konekte nan kont ou</p>
+
+        <div class="input-group">
+          <label>Non itilizatè dousman/Imèl</label>
+          <input type="text" id="login-user" placeholder="ex: ninja123">
+        </div>
+        <div class="input-group">
+          <label>Modpas</label>
+          <input type="password" id="login-pass" placeholder="••••••••">
+        </div>
+
+        <button class="btn-orange" onclick="login()" style="margin-top: 10px;">Konekte</button>
+        <p style="text-align: center; font-size: 12px; color: #888; margin-top: 15px;">
+          Oubyen <a href="#" onclick="showScreen('screen-register')" style="color: #ff5500;">Enskri</a>
+        </p>
+      </div>
+
+      <!-- 3. REGISTER SCREEN -->
+      <div id="screen-register" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-welcome')"><i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+        <h2>Enskri</h2>
+        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Kreye kont ou nan kèk segond</p>
+
+        <div class="input-group">
+          <label>Non itilizatè</label>
+          <input type="text" placeholder="ex: ninja123">
+        </div>
+        <div class="input-group">
+          <label>Imèl</label>
+          <input type="email" placeholder="ex: ou@email.com">
+        </div>
+        <div class="input-group">
+          <label>Modpas</label>
+          <input type="password" placeholder="min. 6 karaktè">
+        </div>
+
+        <button class="btn-orange" onclick="showScreen('screen-dashboard')">Enskri</button>
+      </div>
+
+      <!-- 4. DASHBOARD SCREEN -->
+      <div id="screen-dashboard" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="font-size: 16px;">Bonjou, Ninja 👋</h3>
+            <p style="font-size: 11px; color: #888;">Konsa ou ye jodi a</p>
+          </div>
+          <div style="width: 35px; height: 35px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; border: 1px solid #ff5500;">
+            <i class="fa-solid fa-ninja" style="color: #ff5500;"></i>
+          </div>
+        </div>
+
+        <div class="balance-card">
+          <span style="font-size: 12px; color: #aaa;">Balans Demo</span>
+          <div class="amount" id="dash-balance">$2,500.00</div>
+          <span style="font-size: 10px; background: rgba(0,255,0,0.1); color: #00ff66; padding: 3px 8px; border-radius: 10px;">Sèvis Aktif</span>
+        </div>
+
+        <div class="actions-grid">
+          <div class="action-btn" onclick="showScreen('screen-transfer')">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Transfè</span>
+          </div>
+          <div class="action-btn" onclick="showScreen('screen-deposit')">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Depo</span>
+          </div>
+          <div class="action-btn" onclick="showScreen('screen-history')">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Istwa</span>
+          </div>
+          <div class="action-btn" onclick="showScreen('screen-chat')">
+            <i class="fa-solid fa-robot"></i>
+            <span>Chat AI</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="font-size: 13px; margin-bottom: 10px;">Resous rapid</h4>
+          <div style="display: flex; gap: 10px;">
+            <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center;">
+              <i class="fa-solid fa-bolt" style="color:#00c851;"></i>
+              <div style="font-size: 11px; margin-top: 5px;">Natcash</div>
+            </div>
+            <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center;">
+              <i class="fa-solid fa-mobile-screen" style="color:#ff5500;"></i>
+              <div style="font-size: 11px; margin-top: 5px;">MonCash</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. TRANSFER SCREEN -->
+      <div id="screen-transfer" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Transfè Demo</div>
+          <div></div>
+        </div>
+
+        <div class="input-group" style="margin-top: 15px;">
+          <label>Nimewo destinatè</label>
+          <input type="text" id="transfer-phone" placeholder="+509 3712 3456">
+        </div>
+
+        <div class="input-group">
+          <label>Montan (USD)</label>
+          <input type="number" id="transfer-amount" placeholder="500">
+        </div>
+
+        <p style="font-size: 11px; color: #888; margin-bottom: 20px;">Frè: $0 (Demo)</p>
+
+        <button class="btn-orange" onclick="executeTransfer()">Voye Lajan</button>
+      </div>
+
+      <!-- 6. DEPOSIT SCREEN -->
+      <div id="screen-deposit" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Depo Demo</div>
+          <div></div>
+        </div>
+
+        <div class="card" style="margin-top: 15px; border-left: 4px solid #00c851;">
+          <h4>Natcash Demo</h4>
+          <p style="font-size: 11px; color: #aaa; margin: 5px 0 10px 0;">Ajoute lajan nan kont ou ak Natcash (Demo)</p>
+          <button class="btn-orange" style="background: #00c851;" onclick="addFunds(1000, 'Natcash')">Depoze $1,000</button>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #ff5500;">
+          <h4>MonCash Demo</h4>
+          <p style="font-size: 11px; color: #aaa; margin: 5px 0 10px 0;">Ajoute lajan nan kont ou ak MonCash (Demo)</p>
+          <button class="btn-orange" onclick="addFunds(500, 'MonCash')">Depoze $500</button>
+        </div>
+      </div>
+
+      <!-- 7. HISTORY SCREEN -->
+      <div id="screen-history" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Istwa Transaksyon</div>
+          <div></div>
+        </div>
+
+        <div id="tx-list-container" style="margin-top: 10px;">
+          <!-- Transaksyon ap parèt la dynamique -->
+        </div>
+      </div>
+
+      <!-- 8. VIRTUAL CARD SCREEN -->
+      <div id="screen-card" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Kat Vityèl</div>
+          <div></div>
+        </div>
+
+        <div class="credit-card" style="margin-top: 15px;">
+          <div class="logo"><i class="fa-solid fa-user-ninja"></i> Ninja Wallet</div>
+          <div class="chip"></div>
+          <div class="number">**** **** **** 1234</div>
+          <div class="details">
+            <div>
+              <div>ITILIZATÈ</div>
+              <strong style="color: white;">NINJA DEMO</strong>
+            </div>
+            <div>
+              <div>EXP</div>
+              <strong style="color: white;">12/28</strong>
+            </div>
+            <div>
+              <div>CVV</div>
+              <strong style="color: white;">***</strong>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-orange" onclick="alert('Kat vityèl ou an aktif pou achte sou entènèt!')">Kenbe kat la</button>
+      </div>
+
+      <!-- 9. AI CHAT SCREEN -->
+      <div id="screen-chat" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Ajan + Chat AI</div>
+          <div></div>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+          <div class="msg bot">Byenveni nan Ninja Wallet ! Mwen se ajan ou a. Ki jan mwen kapab ede w jodi a ?</div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <input type="text" id="chat-input" placeholder="Ekri mesaj ou..." style="flex:1; padding: 10px; background: rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white;">
+          <button onclick="sendChat()" style="background: #ff5500; border: none; color: white; width: 40px; border-radius: 10px;"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+
+      <!-- 10. NOTIFICATIONS SCREEN -->
+      <div id="screen-notifications" class="screen">
+        <div class="app-header">
+          <button class="back-btn" onclick="showScreen('screen-dashboard')"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="title">Notifikasyon</div>
+          <div></div>
+        </div>
+
+        <div class="card" style="margin-top: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <i class="fa-solid fa-bell" style="color: #ff5500;"></i>
+            <div>
+              <strong style="font-size: 12px;">Nouveau itilizatè enskri</strong>
+              <p style="font-size: 10px; color: #888;">Yon moun jist enskri sou kont ou a.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. PROFILE SCREE
